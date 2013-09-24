@@ -186,6 +186,7 @@ public class Accueil extends javax.swing.JFrame {
             }
         });
         nouvNoeud.setVisible(true);
+        //test
     }//GEN-LAST:event_jAjoutNoeudActionPerformed
 
     private void jMVoirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMVoirActionPerformed
