@@ -39,9 +39,19 @@ public class ModeleImplementation implements Modele {
      */
     @Override
     public List<NoeudBinaire> getGRD() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        List<NoeudBinaire> list = new ArrayList<NoeudBinaire>();
+        rGetGRD(list,arbre.getRacine());
+        return list;
     }
-
+    
+    private void rGetGRD(List<NoeudBinaire> list, NoeudBinaire curNoeud ){
+        if(curNoeud != null){
+           rGetGRD(list, curNoeud.getGauche());
+           list.add(curNoeud);
+           rGetGRD(list, curNoeud.getDroite());  
+        }
+    }
+    
     /**
      * retourne la liste des noeuds de l'arbre dans l'ordre préfixé.
      *
@@ -50,7 +60,17 @@ public class ModeleImplementation implements Modele {
      */
     @Override
     public List<NoeudBinaire> getRGD() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        List<NoeudBinaire> list = new ArrayList<NoeudBinaire>();
+        rGetRGD(list,arbre.getRacine());
+        return list;
+    }
+    
+    private void rGetRGD(List<NoeudBinaire> list, NoeudBinaire curNoeud ){
+        if(curNoeud != null){
+           list.add(curNoeud);
+           rGetRGD(list, curNoeud.getGauche());
+           rGetRGD(list, curNoeud.getDroite());  
+        }
     }
 
     /**
@@ -61,7 +81,17 @@ public class ModeleImplementation implements Modele {
      */
     @Override
     public List<NoeudBinaire> getGDR() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        List<NoeudBinaire> list = new ArrayList<NoeudBinaire>();
+        rGetGDR(list,arbre.getRacine());
+        return list;
+    }
+    
+    private void rGetGDR(List<NoeudBinaire> list, NoeudBinaire curNoeud ){
+        if(curNoeud != null){
+           rGetGDR(list, curNoeud.getGauche());
+           rGetGDR(list, curNoeud.getDroite());
+           list.add(curNoeud);
+        }
     }
 
     /**
@@ -100,6 +130,7 @@ public class ModeleImplementation implements Modele {
             }
         }
         fire();
+        fireSelection();
     }
 
     /**
@@ -110,7 +141,10 @@ public class ModeleImplementation implements Modele {
      */
     @Override
     public void oteSousArbre(NoeudBinaire noeud) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        NoeudBinaireImplementation noeudBin = (NoeudBinaireImplementation)noeud;
+        noeudBin.setDroite(null);
+        noeudBin.setGauche(null);
+        fire();
     }
 
 
@@ -140,7 +174,8 @@ public class ModeleImplementation implements Modele {
      */
     @Override
     public void setSel(NoeudBinaire sel) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        this.sel = (NoeudBinaireImplementation) sel;
+        this.fireSelection();
     }
 
     @Override
@@ -150,17 +185,17 @@ public class ModeleImplementation implements Modele {
 
     @Override
     public void removeModificationListener(ArbreModificationListener listener) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        arbreModlisteners.remove(listener);
     }
 
     @Override
     public void addSelectionListener(ArbreSelectionListener listener) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        arbreSellisteners.add(listener);
     }
 
     @Override
     public void removeSelectionListener(ArbreSelectionListener listener) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        arbreSellisteners.remove(listener);
     }
 
     /**
@@ -170,7 +205,7 @@ public class ModeleImplementation implements Modele {
      */
     @Override
     public void oteNoeud(NoeudBinaire noeud) {
-  throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
 
@@ -187,6 +222,13 @@ public class ModeleImplementation implements Modele {
     private void fire(){
         for(ArbreModificationListener unArbre: arbreModlisteners){
             unArbre.notifyModArbre();
+        }
+    }
+    
+    private void fireSelection(){
+        System.out.println("nbecouteurssel: "+arbreSellisteners.size());
+        for(ArbreSelectionListener unArbreSel: arbreSellisteners){
+            unArbreSel.notifyNewSelection(sel);
         }
     }
 }

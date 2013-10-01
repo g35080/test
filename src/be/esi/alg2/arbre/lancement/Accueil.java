@@ -4,15 +4,26 @@
  */
 package be.esi.alg2.arbre.lancement;
 
-
+import be.esi.alg2.arbre.db.ArbreDbException;
+import be.esi.alg2.arbre.dto.ArbreCompletDto;
+import be.esi.alg2.arbre.gui.AffichageParcoursJDialog;
+import be.esi.alg2.arbre.gui.ChargerArbreJDialog;
 import be.esi.alg2.arbre.gui.NouveauNoeudJDialog;
+import be.esi.alg2.arbre.gui.SaveAsJDialog;
+import be.esi.alg2.arbre.gui.VoirNoeudSelJDialog;
+import be.esi.alg2.arbre.implementation.NoeudBinaireImplementation;
 import be.esi.alg2.arbre.metier.ArbreBinaireFacade;
+import be.esi.alg2.arbre.mvc.ArbreModificationListener;
+import be.esi.alg2.arbre.mvc.ArbreSelectionListener;
 import be.esi.alg2.arbre.mvc.Modele;
 import be.esi.alg2.arbre.mvc.ProfondeurMaximaleAtteinteException;
+import be.esi.alg2.visuarbre.VisuArbre;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 
 
 /**
@@ -21,7 +32,12 @@ import java.util.logging.Logger;
 public class Accueil extends javax.swing.JFrame {
 
     private NouveauNoeudJDialog nouvNoeud;
+    private ChargerArbreJDialog chargerArbre;
+    private SaveAsJDialog saveAs;
+    private VoirNoeudSelJDialog vueNoeud;
+    private AffichageParcoursJDialog affParcours;
     private Modele modele;
+    private String nomArbreCourant;
     
     /**
      * Creates new form Accueil
@@ -30,8 +46,24 @@ public class Accueil extends javax.swing.JFrame {
         initComponents();
         modele = ArbreBinaireFacade.getModele();
         modele.addModificationListener(visuArbre1);
+        modele.addSelectionListener(visuArbre1);
         visuArbre1.setModele(modele);
         setTitle("Arbre binaire ordonné");
+        nomArbreCourant  = "";
+        visuArbre1.addPropertyChangeListener(VisuArbre.NOEUDSELECTED, new PropertyChangeListener(){
+            @Override
+            public void propertyChange(PropertyChangeEvent pce) {
+                modele.setSel((NoeudBinaireImplementation) pce.getNewValue());
+                if(modele.getSel() == null){
+                    jMsupprimer.setEnabled(false);
+                    jMDelSousArbre.setEnabled(false);
+                }else{
+                    jMsupprimer.setEnabled(true);
+                    jMDelSousArbre.setEnabled(true);
+                }
+            }
+        });
+        
     }
 
 
@@ -74,7 +106,7 @@ public class Accueil extends javax.swing.JFrame {
         );
         visuArbre1Layout.setVerticalGroup(
             visuArbre1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 497, Short.MAX_VALUE)
+            .addGap(0, 496, Short.MAX_VALUE)
         );
 
         getContentPane().add(visuArbre1, java.awt.BorderLayout.CENTER);
@@ -108,6 +140,11 @@ public class Accueil extends javax.swing.JFrame {
         jMenu1.add(jMSauve);
 
         jMSaveAs.setText("Sauver comme ...");
+        jMSaveAs.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMSaveAsActionPerformed(evt);
+            }
+        });
         jMenu1.add(jMSaveAs);
 
         jLLoad.setText("Charger un arbre");
@@ -163,6 +200,11 @@ public class Accueil extends javax.swing.JFrame {
         jMenu3.add(jMsupprimer);
 
         jMDelSousArbre.setText("Supprimer Sous-Arbre");
+        jMDelSousArbre.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMDelSousArbreActionPerformed(evt);
+            }
+        });
         jMenu3.add(jMDelSousArbre);
 
         jMenuBar1.add(jMenu3);
@@ -179,9 +221,8 @@ public class Accueil extends javax.swing.JFrame {
             public void propertyChange(PropertyChangeEvent evt) {
                 try {
                     modele.addValeur(nouvNoeud.getValeur());
-                    visuArbre1.revalidate();
                 } catch (ProfondeurMaximaleAtteinteException ex) {
-                    Logger.getLogger(Accueil.class.getName()).log(Level.SEVERE, null, ex);
+                     JOptionPane.showMessageDialog(null, "Profondeur Maximale Atteinte", "Erreur", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
@@ -189,32 +230,91 @@ public class Accueil extends javax.swing.JFrame {
     }//GEN-LAST:event_jAjoutNoeudActionPerformed
 
     private void jMVoirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMVoirActionPerformed
-
+        vueNoeud = new VoirNoeudSelJDialog(this, false);
+        vueNoeud.notifyNewSelection(modele.getSel());
+        vueNoeud.setVisible(true);
+        modele.addSelectionListener(vueNoeud);
+        vueNoeud.addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosing(java.awt.event.WindowEvent e) {
+                modele.removeSelectionListener(vueNoeud);
+            }
+        });
     }//GEN-LAST:event_jMVoirActionPerformed
 
+    private void afficherParcours(String str){
+        affParcours = new AffichageParcoursJDialog(this, false, modele, str);
+        affParcours.setVisible(true);
+        modele.addModificationListener(affParcours);
+        modele.addSelectionListener(affParcours);
+        affParcours.addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosing(java.awt.event.WindowEvent e) {
+                modele.removeSelectionListener((ArbreSelectionListener) e.getSource());
+                modele.removeModificationListener((ArbreModificationListener) e.getSource());
+            }
+        });
+    }
+    
     private void jMenuGRDActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuGRDActionPerformed
-
+        afficherParcours(AffichageParcoursJDialog.GRD);
     }//GEN-LAST:event_jMenuGRDActionPerformed
 
     private void jMenuRGDActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuRGDActionPerformed
-
+        afficherParcours(AffichageParcoursJDialog.RGD);
     }//GEN-LAST:event_jMenuRGDActionPerformed
 
     private void jMenuGDRActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuGDRActionPerformed
-
+        afficherParcours(AffichageParcoursJDialog.GDR);
     }//GEN-LAST:event_jMenuGDRActionPerformed
 
     private void jMNouveauActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMNouveauActionPerformed
+        modele.setSel(null);
         modele.nouvelArbre();
+        nomArbreCourant  = "";
     }//GEN-LAST:event_jMNouveauActionPerformed
 
     private void jMSauveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMSauveActionPerformed
-
+        if(!nomArbreCourant.isEmpty()){
+            ArbreBinaireFacade.persisteArbre(new ArbreCompletDto(nomArbreCourant, new Date(),modele.getArbre()));
+        }else{
+            saveAs= new SaveAsJDialog(this, false, modele);
+            saveAs.setVisible(true);
+        }
     }//GEN-LAST:event_jMSauveActionPerformed
 
     private void jLLoadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jLLoadActionPerformed
-
+        try {
+            chargerArbre= new ChargerArbreJDialog(this, true);
+            chargerArbre.addPropertyChangeListener(ChargerArbreJDialog.chargementArbre, new PropertyChangeListener(){
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                ArbreCompletDto monArbre =chargerArbre.getArbreACharger();
+                modele.nouvelArbre();
+                nomArbreCourant = monArbre.getId();
+                for(int i=0; i<monArbre.getListe().size();i++){
+                    try {
+                        modele.addValeur(monArbre.getListe().get(i));
+                    } catch (ProfondeurMaximaleAtteinteException ex) {
+                        Logger.getLogger(Accueil.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+            });
+            chargerArbre.setVisible(true);
+        } catch (ArbreDbException ex) {
+            Logger.getLogger(Accueil.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_jLLoadActionPerformed
+
+    private void jMSaveAsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMSaveAsActionPerformed
+        saveAs= new SaveAsJDialog(this, true, modele);
+        saveAs.setVisible(true);
+    }//GEN-LAST:event_jMSaveAsActionPerformed
+
+    private void jMDelSousArbreActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMDelSousArbreActionPerformed
+        modele.oteSousArbre(modele.getSel());
+    }//GEN-LAST:event_jMDelSousArbreActionPerformed
 
     /**
      * @param args the command line arguments

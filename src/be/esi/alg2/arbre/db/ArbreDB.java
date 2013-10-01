@@ -43,14 +43,47 @@ public class ArbreDB {
     }
 
 
+    public static void deleteArbre(ArbreCompletDto aDto) throws ArbreDbException {
+        try {
+            String query = "DELETE FROM Noeud where nomArbre = ?";
+            java.sql.Connection connexion = DBManager.getConnection();
+            java.sql.PreparedStatement stmt = connexion.prepareStatement(query);
+            stmt.setString(1, aDto.getId());
+            stmt.execute();
+            
+            query = "DELETE FROM ArbreBinaire where nom = ?";
+            stmt = connexion.prepareStatement(query);
+            stmt.setString(1, aDto.getId());
+            stmt.execute();
+        } catch (SQLException ex) {
+            throw new ArbreDbException("Suppression d'arbre impossible:\r SQLException: " + ex.getMessage());
+        }
+    }
 
     public static List<ArbreDto> listeNoms(String debNom) throws ArbreDbException {
-            throw new UnsupportedOperationException("Not supported yet.");
+        ArrayList<ArbreDto> liste = new ArrayList<ArbreDto>();
+        try {
+            String query = "SELECT nom  FROM ArbreBinaire where upper(nom) LIKE upper(?) Order by ts DESC ";
+            java.sql.Connection connexion = DBManager.getConnection();
+            java.sql.PreparedStatement stmt = connexion.prepareStatement(query);
+            stmt.setString(1, "%"+debNom+"%");
+
+            java.sql.ResultSet rs = stmt.executeQuery();
+            
+            while (rs.next()) {
+                liste.add(new ArbreDto(rs.getString("nom")));
+            }
+
+        } catch (SQLException e) {
+            throw new ArbreDbException();
+        }
+
+        return liste;
     }
 
     public static ArbreCompletDto chargeArbre(String nom) throws ArbreDbException {
         try {
-            String query = "SELECT cle, libelle  FROM Noeud where nomArbre=? Order by numOrdre ";
+            String query = "SELECT cle, libelle, nomArbre  FROM Noeud where nomArbre=? Order by numOrdre ";
 
             java.sql.Connection connexion = DBManager.getConnection();
             java.sql.PreparedStatement stmt = connexion.prepareStatement(query);

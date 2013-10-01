@@ -88,12 +88,6 @@ public class NouveauNoeudJDialog extends javax.swing.JDialog {
 
         jLabel2.setText("Valeur:");
 
-        valeurTField.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                valeurTFieldActionPerformed(evt);
-            }
-        });
-
         errValJLabel.setForeground(new java.awt.Color(255, 0, 51));
         errValJLabel.setText(" ");
 
@@ -109,7 +103,7 @@ public class NouveauNoeudJDialog extends javax.swing.JDialog {
                         .addComponent(jLabel2)
                         .addGap(18, 18, 18)
                         .addComponent(valeurTField, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap(30, Short.MAX_VALUE))))
+                        .addContainerGap())))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -118,7 +112,7 @@ public class NouveauNoeudJDialog extends javax.swing.JDialog {
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
                     .addComponent(valeurTField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 20, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(errValJLabel)
                 .addContainerGap())
         );
@@ -155,10 +149,6 @@ public class NouveauNoeudJDialog extends javax.swing.JDialog {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void valeurTFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_valeurTFieldActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_valeurTFieldActionPerformed
-
     private void AjouterJButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AjouterJButtonActionPerformed
         Integer clef = null;
         try{
@@ -174,9 +164,9 @@ public class NouveauNoeudJDialog extends javax.swing.JDialog {
         }
         if(clef != null && !valeurTField.getText().isEmpty()){
             val = new Valeur(clef, valeurTField.getText() );
-            this.setVisible(false);
             firePropertyChange(ajoutNoeud, null, val);
-            this.removeAll();
+            this.setVisible(false);
+            
         }
     }//GEN-LAST:event_AjouterJButtonActionPerformed
 

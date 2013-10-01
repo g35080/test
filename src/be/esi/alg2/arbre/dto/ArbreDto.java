@@ -14,4 +14,8 @@ public class ArbreDto extends Dto<String>{
     public ArbreDto(String s){
         id=s;
     }
+
+    public String toString(){
+        return id;
+    }
 }

@@ -5,10 +5,17 @@
 package be.esi.alg2.arbre.metier;
 
 
+
+import be.esi.alg2.arbre.db.ArbreDB;
+import be.esi.alg2.arbre.db.ArbreDbException;
+import be.esi.alg2.arbre.dto.ArbreCompletDto;
 import be.esi.alg2.arbre.dto.ArbreDto;
 import be.esi.alg2.arbre.implementation.ModeleImplementation;
+import be.esi.alg2.arbre.lancement.Accueil;
 import be.esi.alg2.arbre.mvc.Modele;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Classe utilitaire offrant les méthodes d'accès au modèle et les méthodes lièes à la persistance d'arbres
@@ -44,8 +51,15 @@ public class ArbreBinaireFacade {
      * @param nom
      * @throws ArbreMetierException 
      */
-    public static void persisteArbre(String nom) throws ArbreMetierException {
-            throw new UnsupportedOperationException("Not supported yet.");
+    public static void persisteArbre(ArbreCompletDto nom) {
+        try {
+            if( chargeArbre(nom.getId()) != null){
+                ArbreDB.deleteArbre(nom);
+            }
+            ArbreDB.saveArbre(nom);
+        } catch (ArbreDbException ex) {
+            Logger.getLogger(Accueil.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**
@@ -53,7 +67,11 @@ public class ArbreBinaireFacade {
      * @param nom
      * @throws ArbreMetierException 
      */
-    public static void chargeArbre(String nom) throws ArbreMetierException {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public static ArbreCompletDto chargeArbre(String nom){
+        try {
+            return ArbreDB.chargeArbre(nom);
+        } catch (ArbreDbException ex) {
+            return null;
+        }
     }
 }

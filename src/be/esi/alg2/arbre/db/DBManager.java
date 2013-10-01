@@ -4,8 +4,9 @@
 package be.esi.alg2.arbre.db;
 
 
-import java.sql.*;
-
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 /**
  * Offre les outils de connexion et de gestion de transaction. 
  */
