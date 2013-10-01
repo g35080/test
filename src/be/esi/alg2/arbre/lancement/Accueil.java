@@ -16,6 +16,7 @@ import be.esi.alg2.arbre.metier.ArbreBinaireFacade;
 import be.esi.alg2.arbre.mvc.ArbreModificationListener;
 import be.esi.alg2.arbre.mvc.ArbreSelectionListener;
 import be.esi.alg2.arbre.mvc.Modele;
+import be.esi.alg2.arbre.mvc.NoeudBinaire;
 import be.esi.alg2.arbre.mvc.ProfondeurMaximaleAtteinteException;
 import be.esi.alg2.visuarbre.VisuArbre;
 import java.beans.PropertyChangeEvent;
@@ -29,7 +30,7 @@ import javax.swing.JOptionPane;
 /**
  * JFrame d'accueil de l'application de visualisation des arbres binaires
  */
-public class Accueil extends javax.swing.JFrame {
+public class Accueil extends javax.swing.JFrame implements ArbreSelectionListener {
 
     private NouveauNoeudJDialog nouvNoeud;
     private ChargerArbreJDialog chargerArbre;
@@ -44,9 +45,12 @@ public class Accueil extends javax.swing.JFrame {
      */
     public Accueil() {
         initComponents();
+        jMsupprimer.setEnabled(false);
+        jMDelSousArbre.setEnabled(false);
         modele = ArbreBinaireFacade.getModele();
         modele.addModificationListener(visuArbre1);
         modele.addSelectionListener(visuArbre1);
+        
         visuArbre1.setModele(modele);
         setTitle("Arbre binaire ordonné");
         nomArbreCourant  = "";
@@ -54,16 +58,9 @@ public class Accueil extends javax.swing.JFrame {
             @Override
             public void propertyChange(PropertyChangeEvent pce) {
                 modele.setSel((NoeudBinaireImplementation) pce.getNewValue());
-                if(modele.getSel() == null){
-                    jMsupprimer.setEnabled(false);
-                    jMDelSousArbre.setEnabled(false);
-                }else{
-                    jMsupprimer.setEnabled(true);
-                    jMDelSousArbre.setEnabled(true);
-                }
             }
         });
-        
+        modele.addSelectionListener(this);
     }
 
 
@@ -237,7 +234,7 @@ public class Accueil extends javax.swing.JFrame {
         vueNoeud.addWindowListener(new java.awt.event.WindowAdapter() {
             @Override
             public void windowClosing(java.awt.event.WindowEvent e) {
-                modele.removeSelectionListener(vueNoeud);
+                modele.removeSelectionListener((VoirNoeudSelJDialog) e.getSource());
             }
         });
     }//GEN-LAST:event_jMVoirActionPerformed
@@ -372,4 +369,15 @@ public class Accueil extends javax.swing.JFrame {
     private javax.swing.JPopupMenu.Separator jSeparator4;
     private be.esi.alg2.visuarbre.VisuArbre visuArbre1;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public void notifyNewSelection(NoeudBinaire nb) {
+        if(modele.getSel() == null){
+            jMsupprimer.setEnabled(false);
+            jMDelSousArbre.setEnabled(false);
+        }else{
+            jMsupprimer.setEnabled(true);
+            jMDelSousArbre.setEnabled(true);
+        }
+    }
 }

@@ -226,7 +226,6 @@ public class ModeleImplementation implements Modele {
     }
     
     private void fireSelection(){
-        System.out.println("nbecouteurssel: "+arbreSellisteners.size());
         for(ArbreSelectionListener unArbreSel: arbreSellisteners){
             unArbreSel.notifyNewSelection(sel);
         }
